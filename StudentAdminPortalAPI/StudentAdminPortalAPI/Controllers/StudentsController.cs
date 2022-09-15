@@ -13,7 +13,7 @@ namespace StudentAdminPortalAPI.Controllers
 
     public class StudentsController : Controller
 
-        
+
     {
         private readonly IStudentRepository studentReposistory;
         private readonly IMapper mapper;
@@ -31,8 +31,8 @@ namespace StudentAdminPortalAPI.Controllers
             var students = await studentReposistory.GetStudentsAsync();
 
 
-            return Ok(mapper.Map<List<Student>>(students));  
-            
+            return Ok(mapper.Map<List<Student>>(students));
+
         }
 
         [HttpGet]
@@ -42,12 +42,36 @@ namespace StudentAdminPortalAPI.Controllers
             //Fetch Student Details
             var student = await studentReposistory.GetStudentAsync(studentId);
             //Return Student
-            if(student == null)
+            if (student == null)
             {
                 return NotFound();
             }
 
             return Ok(mapper.Map<Student>(student));
         }
+
+        [HttpPut ]
+        [Route("[controller]/{studentId:guid}")]
+
+        public async Task<IActionResult> UpdateStudentAsync([FromRoute] Guid studentId, [FromBody] UpdateStudentRequest request)
+        {
+            if (await studentReposistory.Exists(studentId))
+            {
+                //update details
+                var updatedStudent = await studentReposistory.UpdateStudent(studentId, mapper.Map<DataModels.Student>(request));
+
+                if (updatedStudent != null)
+                {
+                    return Ok(mapper.Map<Student>(updatedStudent));
+                }
+            }
+          
+                return NotFound();
+            
+        }
+
+
+
+
     }
 }
